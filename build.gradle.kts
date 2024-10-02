@@ -1,85 +1,83 @@
-object Constants {
-    const val JAVA_VERSION: Int = 17
-
-    // https://fabricmc.net/develop/
-    const val MINECRAFT_VERSION: String = "1.20.4"
-    const val YARN_MAPPINGS: String = "1.20.4+build.1"
-    const val FABRIC_LOADER_VERSION: String = "0.15.11"
-    const val FABRIC_API_VERSION: String = "0.97.2+1.20.4";
-
-    // https://semver.org/
-    const val MOD_VERSION: String = "1.1.0"
-}
-
 plugins {
-    id("fabric-loom").version("1.7.+")
+    id("fabric-loom") version("1.7.+") apply(false)
     id("java")
-    id("maven-publish")
 }
 
-base {
-    archivesName = "blurserveraddress"
+val JAVA_VERSION by extra { 21 }
 
-    group = "kr.shihyeon.blurserveraddress"
-    version = createVersionString()
-}
+val MINECRAFT_VERSION by extra { "1.21.1" }
+val FABRIC_LOADER_VERSION by extra { "0.15.11" }
+val FABRIC_API_VERSION by extra { "0.104.0+1.21.1" }
+val NEOFORGE_VERSION by extra { "21.1.23" }
 
-repositories {
-    mavenCentral()
-}
+// This value can be set to null to disable Parchment.
+val PARCHMENT_VERSION by extra { null }
 
-dependencies {
-    minecraft("com.mojang:minecraft:${Constants.MINECRAFT_VERSION}")
-    mappings("net.fabricmc:yarn:${Constants.YARN_MAPPINGS}:v2")
-    modImplementation("net.fabricmc:fabric-loader:${Constants.FABRIC_LOADER_VERSION}")
+// https://semver.org/
+val MAVEN_GROUP by extra { "kr.shihyeon" }
+val ARCHIVE_NAME by extra { "blurserveraddress" }
+val MOD_VERSION by extra { "1.1.0" }
 
-    fun addDependentFabricModule(name: String) {
-        val module = fabricApi.module(name, Constants.FABRIC_API_VERSION)
-        modImplementation(module)
-    }
-    addDependentFabricModule("fabric-api-base")
-    addDependentFabricModule("fabric-resource-loader-v0")
-}
-
-tasks {
-    processResources {
-        val propertiesMap = mapOf(
-            "version" to project.version,
-            "minecraft_version" to Constants.MINECRAFT_VERSION,
-            "loader_version" to Constants.FABRIC_LOADER_VERSION,
-        )
-
-        inputs.properties(propertiesMap)
-
-        filesMatching("fabric.mod.json") {
-            expand(propertiesMap)
-        }
-    }
-
-    jar {
-        from("${rootProject.projectDir}/LICENSE")
-    }
+allprojects {
+    apply(plugin = "java")
+    apply(plugin = "maven-publish")
 }
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-    options.release = Constants.JAVA_VERSION
+}
+
+tasks.jar {
+    enabled = false
+}
+
+subprojects {
+    apply(plugin = "maven-publish")
+
+    java.toolchain.languageVersion = JavaLanguageVersion.of(JAVA_VERSION)
+
+    tasks.processResources {
+        val propertiesMap = mapOf(
+            "version" to createVersionString(),
+            "minecraft_version" to MINECRAFT_VERSION,
+            "fabric_loader_version" to FABRIC_LOADER_VERSION,
+            "neoforge_version" to NEOFORGE_VERSION
+        )
+
+        inputs.properties(propertiesMap)
+
+        filesMatching(listOf("META-INF/neoforge.mods.toml", "fabric.mod.json")) {
+            expand(propertiesMap)
+        }
+    }
+
+    version = createVersionString()
+    group = MAVEN_GROUP
+
+    tasks.withType<JavaCompile> {
+        options.encoding = "UTF-8"
+        options.release.set(JAVA_VERSION)
+    }
+
+    tasks.withType<GenerateModuleMetadata>().configureEach {
+        enabled = false
+    }
 }
 
 fun createVersionString(): String {
     val builder = StringBuilder()
 
-    val isReleaseBuild = System.getProperty("build.release") != null
+    val isReleaseBuild = project.hasProperty("build.release")
     val buildId = System.getenv("GITHUB_RUN_NUMBER")
 
     if (isReleaseBuild) {
-        builder.append(Constants.MOD_VERSION)
+        builder.append(MOD_VERSION)
     } else {
-        builder.append(Constants.MOD_VERSION.substringBefore('-'))
+        builder.append(MOD_VERSION.substringBefore('-'))
         builder.append("-snapshot")
     }
 
-    builder.append("+mc").append(Constants.MINECRAFT_VERSION)
+    builder.append("+mc").append(MINECRAFT_VERSION)
 
     if (!isReleaseBuild) {
         if (buildId != null) {
@@ -90,4 +88,11 @@ fun createVersionString(): String {
     }
 
     return builder.toString()
+}
+
+tasks.register("printProperties") {
+    doLast {
+        println("MINECRAFT_VERSION=${MINECRAFT_VERSION}")
+        println("MOD_VERSION=${createVersionString()}")
+    }
 }

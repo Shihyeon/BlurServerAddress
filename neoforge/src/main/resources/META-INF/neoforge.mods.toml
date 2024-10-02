@@ -1,0 +1,39 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "LGPL-3.0-only"
+
+[[mods]]
+modId = "blurserveraddress"
+
+displayName = "BlurServerAddress"
+
+version = "${version}"
+
+authors = "Shihyeon"
+
+description = '''
+
+'''
+
+[[mixins]]
+config = "blurserveraddress.mixins.json"
+
+[[mixins]]
+config = "blurserveraddress.neoforge.mixins.json"
+
+#[[accessTransformers]]
+#file = "META-INF/accesstransformer.cfg"
+
+[[dependencies.blurserveraddress]]
+modId = "neoforge"
+type = "required" #mandatory (Can be one of "required", "optional", "incompatible" or "discouraged")
+versionRange = "[${neoforge_version},)"
+ordering = "NONE" # The order that this dependency should load in relation to your mod, required to be either 'BEFORE' or 'AFTER' if the dependency is not mandatory
+side = "CLIENT" # Side this dependency is applied on - 'BOTH', 'CLIENT' or 'SERVER'
+
+[[dependencies.blurserveraddress]]
+modId = "minecraft"
+type = "required"
+versionRange = "[${minecraft_version},)"
+ordering = "NONE"
+side = "CLIENT"

@@ -1,16 +1,13 @@
-package kr.shihyeon.blurserveraddress.client;
+package kr.shihyeon.blurserveraddress.fabric.client;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 @Environment(EnvType.CLIENT)
-public class BlurServerAddressClient implements ClientModInitializer {
-
-    public static final String MODID = "blurserveraddress";
+public class BlurServerAddressClientFabric implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-
     }
 }
