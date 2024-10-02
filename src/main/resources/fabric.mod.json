@@ -1,0 +1,30 @@
+{
+    "schemaVersion": 1,
+    "id": "blurserveraddress",
+    "version": "${version}",
+    "name": "BlurServerAddress",
+    "description": "",
+    "authors": [
+        {
+            "name": "@Shihyeon",
+            "contact": {
+                "homepage": "https://github.com/Shihyeon"
+            }
+        }
+    ],
+    "license": "LGPL-3.0-only",
+    "environment": "client",
+    "entrypoints": {
+        "client": [
+            "kr.shihyeon.blurserveraddress.client.BlurServerAddressClient"
+        ]
+    },
+    "mixins": [
+        "blurserveraddress.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=${loader_version}",
+        "minecraft": ">=${minecraft_version}",
+        "java": ">=17"
+    }
+}
