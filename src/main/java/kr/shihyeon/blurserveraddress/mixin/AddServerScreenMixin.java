@@ -1,7 +1,7 @@
 package kr.shihyeon.blurserveraddress.mixin;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.AddServerScreen;
+import net.minecraft.client.gui.screen.multiplayer.AddServerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
