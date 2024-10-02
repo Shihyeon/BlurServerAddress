@@ -5,6 +5,7 @@ object Constants {
     const val MINECRAFT_VERSION: String = "1.20.4"
     const val YARN_MAPPINGS: String = "1.20.4+build.1"
     const val FABRIC_LOADER_VERSION: String = "0.15.11"
+    const val FABRIC_API_VERSION: String = "0.97.2+1.20.4";
 
     // https://semver.org/
     const val MOD_VERSION: String = "1.0.0"
@@ -31,6 +32,13 @@ dependencies {
     minecraft("com.mojang:minecraft:${Constants.MINECRAFT_VERSION}")
     mappings("net.fabricmc:yarn:${Constants.YARN_MAPPINGS}:v2")
     modImplementation("net.fabricmc:fabric-loader:${Constants.FABRIC_LOADER_VERSION}")
+
+    fun addDependentFabricModule(name: String) {
+        val module = fabricApi.module(name, Constants.FABRIC_API_VERSION)
+        modImplementation(module)
+    }
+    addDependentFabricModule("fabric-api-base")
+    addDependentFabricModule("fabric-resource-loader-v0")
 }
 
 tasks {
