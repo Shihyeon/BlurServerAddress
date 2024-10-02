@@ -30,9 +30,4 @@ public abstract class AddServerScreenMixin {
     private void restoreAddressField(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         addressField.setText(actualAddress);
     }
-
-    @Inject(method = "tick", at = @At("HEAD"))
-    private void captureActualAddress(CallbackInfo ci) {
-        actualAddress = addressField.getText();
-    }
 }
