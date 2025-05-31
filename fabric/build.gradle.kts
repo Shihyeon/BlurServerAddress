@@ -1,40 +1,31 @@
 plugins {
-    id("java")
-    id("idea")
-    id("fabric-loom") version ("1.7.+")
-}
+    id("multiloader-platform")
 
-val MINECRAFT_VERSION: String by rootProject.extra
-val PARCHMENT_VERSION: String? by rootProject.extra
-val FABRIC_LOADER_VERSION: String by rootProject.extra
-val FABRIC_API_VERSION: String by rootProject.extra
-val MOD_VERSION: String by rootProject.extra
+    id("fabric-loom") version ("1.10.+")
+}
 
 base {
     archivesName.set("blurserveraddress-fabric")
 }
 
-sourceSets {
-    main.get().apply {
-        compileClasspath += project(":common").sourceSets.main.get().output
-    }
+val configurationCommonModJava: Configuration = configurations.create("commonJava") {
+    isCanBeResolved = true
+}
+val configurationCommonModResources: Configuration = configurations.create("commonResources") {
+    isCanBeResolved = true
 }
 
 repositories {
+    maven("https://maven.terraformersmc.com/releases/")
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:${MINECRAFT_VERSION}")
-    mappings(loom.layered {
-        officialMojangMappings()
-        if (PARCHMENT_VERSION != null) {
-            parchment("org.parchmentmc.data:parchment-${MINECRAFT_VERSION}:${PARCHMENT_VERSION}@zip")
-        }
-    })
-    modImplementation("net.fabricmc:fabric-loader:$FABRIC_LOADER_VERSION")
+    configurationCommonModJava(project(path = ":common", configuration = "commonMainJava"))
+
+    configurationCommonModResources(project(path = ":common", configuration = "commonMainResources"))
 
     fun addDependentFabricModule(name: String) {
-        val module = fabricApi.module(name, FABRIC_API_VERSION)
+        val module = fabricApi.module(name, BuildConfig.FABRIC_API_VERSION)
         modImplementation(module)
     }
 
@@ -43,48 +34,51 @@ dependencies {
     addDependentFabricModule("fabric-resource-loader-v0")
 }
 
-tasks.named("compileTestJava").configure {
-    enabled = false
+sourceSets.apply {
+    main {
+        compileClasspath += configurationCommonModJava
+        runtimeClasspath += configurationCommonModJava
+    }
 }
 
-tasks.named("test").configure {
-    enabled = false
+dependencies {
+    minecraft("com.mojang:minecraft:${BuildConfig.MINECRAFT_VERSION}")
+    mappings(loom.layered {
+        officialMojangMappings()
+
+        if (BuildConfig.PARCHMENT_VERSION != null) {
+            parchment("org.parchmentmc.data:parchment-${BuildConfig.MINECRAFT_VERSION}:${BuildConfig.PARCHMENT_VERSION}@zip")
+        }
+    })
+    modImplementation("net.fabricmc:fabric-loader:${BuildConfig.FABRIC_LOADER_VERSION}")
 }
 
 loom {
-//    if (project(":common").file("src/main/resources/blurserveraddress.accesswidener").exists())
-//        accessWidenerPath.set(project(":common").file("src/main/resources/blurserveraddress.accesswidener"))
-
-    @Suppress("UnstableApiUsage")
-    mixin { defaultRefmapName.set("blurserveraddress.fabric.refmap.json") }
+    mixin {
+        useLegacyMixinAp = false
+    }
 
     runs {
         named("client") {
             client()
-            configName = "Fabric Client"
+            configName = "Fabric/Client"
+            appendProjectPathToConfigName = false
             ideConfigGenerated(true)
             runDir("run")
         }
     }
-
 }
 
 tasks {
-    withType<JavaCompile> {
-        source(project(":common").sourceSets.main.get().allSource)
+    jar {
+        from(configurationCommonModJava)
+    }
+
+    remapJar {
+        destinationDirectory.set(file(rootProject.layout.buildDirectory).resolve("mods"))
     }
 
     processResources {
-        from(project.project(":common").sourceSets.main.get().resources)
-
-        inputs.property("version", project.version)
-
-        filesMatching("fabric.mod.json") {
-            expand(mapOf("version" to project.version))
-        }
-    }
-
-    jar {
-        from(rootDir.resolve("LICENSE"))
+        from(configurationCommonModResources)
     }
 }
