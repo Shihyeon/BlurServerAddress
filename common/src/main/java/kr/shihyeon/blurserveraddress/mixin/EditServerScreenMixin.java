@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.EditServerScreen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -53,9 +54,9 @@ public abstract class EditServerScreenMixin {
 
         RenderSystem.defaultBlendFunc();
         if (!isLCtrlAltPressed()) {
-            context.blit(BLUE_EYE_TEXTURE, ipEdit.getX() + ipEdit.getWidth() - ipEdit.getHeight() - 1, ipEdit.getY(), 0, 0, ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight());
+            context.blit(RenderType::guiTextured, BLUE_EYE_TEXTURE, ipEdit.getX() + ipEdit.getWidth() - ipEdit.getHeight() - 1, ipEdit.getY(), 0, 0, ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight());
         } else {
-            context.blit(EYE_TEXTURE, ipEdit.getX() + ipEdit.getWidth() - ipEdit.getHeight() - 1, ipEdit.getY(), 0, 0, ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight());
+            context.blit(RenderType::guiTextured, EYE_TEXTURE, ipEdit.getX() + ipEdit.getWidth() - ipEdit.getHeight() - 1, ipEdit.getY(), 0, 0, ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight());
         }
         RenderSystem.disableBlend();
 

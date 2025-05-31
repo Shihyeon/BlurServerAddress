@@ -1,9 +1,9 @@
 ### Requirements
 - Java 21
-- Minecraft 1.21.1
+- Minecraft 1.21.2
 - Fabric loader 0.16.13
-- Fabric API 0.104.0+1.21.1
-- NeoForge 21.1.23
+- Fabric API 0.106.1+1.21.2
+- NeoForge 21.2.1-beta
 
 ### Changes (1.1.0 -> 1.2.0)
 - Supported NeoForge
