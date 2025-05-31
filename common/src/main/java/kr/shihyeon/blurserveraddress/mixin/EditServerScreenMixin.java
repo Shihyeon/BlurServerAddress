@@ -52,13 +52,11 @@ public abstract class EditServerScreenMixin {
     private void restoreAddressField(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         ipEdit.setValue(actualAddress);
 
-        RenderSystem.defaultBlendFunc();
         if (!isLCtrlAltPressed()) {
             context.blit(RenderType::guiTextured, BLUE_EYE_TEXTURE, ipEdit.getX() + ipEdit.getWidth() - ipEdit.getHeight() - 1, ipEdit.getY(), 0, 0, ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight());
         } else {
             context.blit(RenderType::guiTextured, EYE_TEXTURE, ipEdit.getX() + ipEdit.getWidth() - ipEdit.getHeight() - 1, ipEdit.getY(), 0, 0, ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight());
         }
-        RenderSystem.disableBlend();
 
         if (ipEdit.isFocused() && isMouseOverAddressField(mouseX, mouseY)) {
             renderTooltip(context, mouseX, mouseY);
