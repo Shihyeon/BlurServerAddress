@@ -1,13 +1,12 @@
 package kr.shihyeon.blurserveraddress.mixin;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import kr.shihyeon.blurserveraddress.client.BlurServerAddressClient;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.EditServerScreen;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -53,9 +52,9 @@ public abstract class EditServerScreenMixin {
         ipEdit.setValue(actualAddress);
 
         if (!isLCtrlAltPressed()) {
-            context.blit(RenderType::guiTextured, BLUE_EYE_TEXTURE, ipEdit.getX() + ipEdit.getWidth() - ipEdit.getHeight() - 1, ipEdit.getY(), 0, 0, ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight());
+            context.blit(RenderPipelines.GUI_TEXTURED, BLUE_EYE_TEXTURE, ipEdit.getX() + ipEdit.getWidth() - ipEdit.getHeight() - 1, ipEdit.getY(), 0, 0, ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight());
         } else {
-            context.blit(RenderType::guiTextured, EYE_TEXTURE, ipEdit.getX() + ipEdit.getWidth() - ipEdit.getHeight() - 1, ipEdit.getY(), 0, 0, ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight());
+            context.blit(RenderPipelines.GUI_TEXTURED, EYE_TEXTURE, ipEdit.getX() + ipEdit.getWidth() - ipEdit.getHeight() - 1, ipEdit.getY(), 0, 0, ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight(), ipEdit.getHeight());
         }
 
         if (ipEdit.isFocused() && isMouseOverAddressField(mouseX, mouseY)) {
@@ -91,6 +90,6 @@ public abstract class EditServerScreenMixin {
         } else {
             tooltipText = Component.translatable("blurserveraddress.text.desc");
         }
-        context.renderTooltip(client.font, tooltipText.setStyle(Style.EMPTY.withColor(ChatFormatting.RED)), mouseX, mouseY);
+        context.setTooltipForNextFrame(client.font, tooltipText.setStyle(Style.EMPTY.withColor(ChatFormatting.RED)), mouseX, mouseY);
     }
 }
