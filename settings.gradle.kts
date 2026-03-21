@@ -1,4 +1,4 @@
-rootProject.name = "BlurServerAddress"
+rootProject.name = "blur-server-address"
 
 pluginManagement {
     repositories {

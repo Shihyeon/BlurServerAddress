@@ -1,7 +1,7 @@
 plugins {
     id("multiloader-platform")
 
-    id("fabric-loom") version ("1.10.+")
+    id("fabric-loom") version ("1.11.+")
 }
 
 base {

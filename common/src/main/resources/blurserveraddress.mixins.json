@@ -7,7 +7,7 @@
   "mixins": [
   ],
   "client": [
-    "EditServerScreenMixin"
+    "ManageServerScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

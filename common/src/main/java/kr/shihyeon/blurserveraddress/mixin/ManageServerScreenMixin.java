@@ -5,7 +5,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.EditServerScreen;
+import net.minecraft.client.gui.screens.ManageServerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -20,8 +20,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(EditServerScreen.class)
-public abstract class EditServerScreenMixin {
+@Mixin(ManageServerScreen.class)
+public abstract class ManageServerScreenMixin {
 
     @Unique
     private final Minecraft client = Minecraft.getInstance();
@@ -47,7 +47,7 @@ public abstract class EditServerScreenMixin {
         }
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
+    @Inject(method = "render", at = @At("RETURN"))
     private void restoreAddressField(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         ipEdit.setValue(actualAddress);
 
@@ -64,7 +64,7 @@ public abstract class EditServerScreenMixin {
 
     @Unique
     private boolean isLCtrlAltPressed() {
-        long windowHandle = client.getWindow().getWindow();
+        long windowHandle = client.getWindow().handle();
         return GLFW.glfwGetKey(windowHandle, GLFW.GLFW_KEY_LEFT_CONTROL) == GLFW.GLFW_PRESS
                 && GLFW.glfwGetKey(windowHandle, GLFW.GLFW_KEY_LEFT_ALT) == GLFW.GLFW_PRESS;
     }
