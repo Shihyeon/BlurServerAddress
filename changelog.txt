@@ -5,6 +5,6 @@
 - Fabric API 0.134.1+1.21.9
 - NeoForge 21.9.16-beta
 
-### Changes (1.2.0)
+### Changes (1.2.1)
 - Updated to Minecraft 1.21.9
 - Fixed return value
