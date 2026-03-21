@@ -7,3 +7,4 @@
 
 ### Changes (1.2.0)
 - Updated to Minecraft 1.21.9
+- Fixed return value
