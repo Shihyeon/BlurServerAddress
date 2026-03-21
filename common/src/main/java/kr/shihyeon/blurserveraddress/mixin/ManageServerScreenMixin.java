@@ -11,7 +11,7 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,9 +33,9 @@ public abstract class ManageServerScreenMixin {
     private String actualAddress = "";
 
     @Unique
-    private static final ResourceLocation EYE_TEXTURE = ResourceLocation.fromNamespaceAndPath(BlurServerAddressClient.MODID, "textures/gui/eye.png");
+    private static final Identifier EYE_TEXTURE = Identifier.fromNamespaceAndPath(BlurServerAddressClient.MODID, "textures/gui/eye.png");
     @Unique
-    private static final ResourceLocation BLUE_EYE_TEXTURE = ResourceLocation.fromNamespaceAndPath(BlurServerAddressClient.MODID, "textures/gui/blur_eye.png");
+    private static final Identifier BLUE_EYE_TEXTURE = Identifier.fromNamespaceAndPath(BlurServerAddressClient.MODID, "textures/gui/blur_eye.png");
 
     @Inject(method = "render", at = @At("HEAD"))
     private void maskAddressField(GuiGraphics context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
