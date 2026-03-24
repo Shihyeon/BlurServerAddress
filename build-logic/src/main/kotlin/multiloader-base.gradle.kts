@@ -16,17 +16,3 @@ tasks.withType<JavaCompile> {
 tasks.withType<GenerateModuleMetadata>().configureEach {
     enabled = false
 }
-
-repositories {
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "Parchment"
-                url = uri("https://maven.parchmentmc.org")
-            }
-        }
-        filter {
-            includeGroup("org.parchmentmc.data")
-        }
-    }
-}

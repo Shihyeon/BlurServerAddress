@@ -6,6 +6,11 @@ name: build-release
 on:
   workflow_dispatch:
     inputs:
+      publish:
+        required: true
+        type: boolean
+        default: true
+        description: 'Whether to publish the built artifacts to Modrinth and Curseforge'
       version-type:
         required: true
         type: choice
@@ -15,6 +20,21 @@ on:
           - beta
           - alpha
         description: 'Publishing version type'
+      include-snapshot:
+        required: false
+        type: boolean
+        default: false
+        description: 'Whether to include snapshot versions in the published artifacts'
+      fabric-artifact:
+        required: false
+        type: boolean
+        default: true
+        description: 'Whether to publish the Fabric/Quilt artifact'
+      neoforge-artifact:
+        required: false
+        type: boolean
+        default: true
+        description: 'Whether to publish the NeoForge artifact'
       changelog-text:
         required: false
         type: string
@@ -26,119 +46,31 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Setup Java 21
-        uses: actions/setup-java@v4
+      - name: Setup Java 25
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 21
+          java-version: 25
 
       - name: Make gradle wrapper executable
         run: chmod +x ./gradlew
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
         with:
           cache-read-only: true
 
-      - name: Read properties from build.gradle.kts
-        run: |
-          MINECRAFT_VERSION=$(./gradlew -q printProperties -Pbuild.release=true | grep "MINECRAFT_VERSION" | cut -d'=' -f2)
-          MOD_VERSION=$(./gradlew -q printProperties -Pbuild.release=true | grep "MOD_VERSION" | cut -d'=' -f2)
-          echo "MINECRAFT_VERSION=$MINECRAFT_VERSION" >> $GITHUB_ENV
-          echo "MOD_VERSION=$MOD_VERSION" >> $GITHUB_ENV
-        id: properties
-
-      - name: Run build with Gradle Wrapper
-        run: ./gradlew build -Pbuild.release=true
-
-      # https://github.com/Kir-Antipov/mc-publish
-      - name: Upload artifacts to Modrinth for NeoForge with changelog
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          files: build/mods/*-neoforge-*.jar
-          name: Blur Server Address ${{ env.MOD_VERSION }} for NeoForge
-          version: mc${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}-neoforge
-          modrinth-id: 559boQnq
-          modrinth-featured: false
-          version-type: ${{ inputs.version-type }}
-          changelog: ${{ inputs.changelog-text }}
-          loaders: neoforge
-        if: ${{ inputs.changelog-text != '' }}
-
-      - name: Upload artifacts to Modrinth for Fabric & Quilt with changelog
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          files: build/mods/*-fabric-*.jar
-          name: Blur Server Address ${{ env.MOD_VERSION }} for Fabric
-          version: mc${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}-fabric
-          modrinth-id: 559boQnq
-          modrinth-featured: false
-          version-type: ${{ inputs.version-type }}
-          changelog: ${{ inputs.changelog-text }}
-          loaders: fabric quilt
-          dependencies: |
-            fabric-api{modrinth:P7dR8mSH}
-        if: ${{ inputs.changelog-text != '' }}
-
-      - name: Upload artifacts to GitHub with changelog
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          files: |
-            build/mods/*-fabric-*.jar
-            build/mods/*-neoforge-*.jar
-          name: Blur Server Address ${{ env.MOD_VERSION }} for Minecraft ${{ env.MINECRAFT_VERSION }}
-          version: ${{ env.MOD_VERSION }}+mc${{ env.MINECRAFT_VERSION }}
-          version-type: ${{ inputs.version-type }}
-          changelog: ${{ inputs.changelog-text }}
-          github-generate-changelog: true
-        if: ${{ inputs.changelog-text != '' }}
-
-      # with changelog-file
-      - name: Upload artifacts to Modrinth for NeoForge with changelog-file
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          files: build/mods/*-neoforge-*.jar
-          name: Blur Server Address ${{ env.MOD_VERSION }} for NeoForge
-          version: mc${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}-neoforge
-          modrinth-id: 559boQnq
-          modrinth-featured: false
-          version-type: ${{ inputs.version-type }}
-          changelog-file: changelog.txt
-          loaders: neoforge
-        if: ${{ inputs.changelog-text == '' }}
-
-      - name: Upload artifacts to Modrinth for Fabric & Quilt with changelog-file
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          files: build/mods/*-fabric-*.jar
-          name: Blur Server Address ${{ env.MOD_VERSION }} for Fabric
-          version: mc${{ env.MINECRAFT_VERSION }}-${{ env.MOD_VERSION }}-fabric
-          modrinth-id: 559boQnq
-          modrinth-featured: false
-          version-type: ${{ inputs.version-type }}
-          changelog-file: changelog.txt
-          loaders: fabric quilt
-          dependencies: |
-            fabric-api{modrinth:P7dR8mSH}
-        if: ${{ inputs.changelog-text == '' }}
-
-      - name: Upload artifacts to GitHub with changelog-file
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          files: |
-            build/mods/*-fabric-*.jar
-            build/mods/*-neoforge-*.jar
-          name: Blur Server Address ${{ env.MOD_VERSION }} for Minecraft ${{ env.MINECRAFT_VERSION }}
-          version: ${{ env.MOD_VERSION }}+mc${{ env.MINECRAFT_VERSION }}
-          version-type: ${{ inputs.version-type }}
-          changelog-file: changelog.txt
-          github-generate-changelog: true
-        if: ${{ inputs.changelog-text == '' }}
+      - name: Build and Publish
+        run: ./gradlew publishMods -Pbuild.release=true
+        env:
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHANGELOG_TEXT: ${{ inputs.changelog-text }}
+          VERSION_TYPE: ${{ inputs.version-type }}
+          INCLUDE_SNAPSHOTS: ${{ inputs.include-snapshot }}
+          PUBLISH_ENABLED: ${{ inputs.publish }}
+          FABRIC_ARTIFACT: ${{ inputs.fabric-artifact }}
+          NEOFORGE_ARTIFACT: ${{ inputs.neoforge-artifact }}

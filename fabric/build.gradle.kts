@@ -1,7 +1,6 @@
 plugins {
     id("multiloader-platform")
-
-    id("fabric-loom") version ("1.13.+")
+    id("net.fabricmc.fabric-loom") version ("1.15.+")
 }
 
 base {
@@ -21,17 +20,16 @@ repositories {
 
 dependencies {
     configurationCommonModJava(project(path = ":common", configuration = "commonMainJava"))
-
     configurationCommonModResources(project(path = ":common", configuration = "commonMainResources"))
 
     fun addDependentFabricModule(name: String) {
         val module = fabricApi.module(name, BuildConfig.FABRIC_API_VERSION)
-        modImplementation(module)
+        implementation(module)
     }
 
     // Fabric API modules
     addDependentFabricModule("fabric-api-base")
-    addDependentFabricModule("fabric-resource-loader-v0")
+    addDependentFabricModule("fabric-resource-loader-v1")
 }
 
 sourceSets.apply {
@@ -43,14 +41,7 @@ sourceSets.apply {
 
 dependencies {
     minecraft("com.mojang:minecraft:${BuildConfig.MINECRAFT_VERSION}")
-    mappings(loom.layered {
-        officialMojangMappings()
-
-        if (BuildConfig.PARCHMENT_VERSION != null) {
-            parchment("org.parchmentmc.data:parchment-${BuildConfig.MINECRAFT_VERSION}:${BuildConfig.PARCHMENT_VERSION}@zip")
-        }
-    })
-    modImplementation("net.fabricmc:fabric-loader:${BuildConfig.FABRIC_LOADER_VERSION}")
+    implementation("net.fabricmc:fabric-loader:${BuildConfig.FABRIC_LOADER_VERSION}")
 }
 
 loom {
@@ -72,9 +63,6 @@ loom {
 tasks {
     jar {
         from(configurationCommonModJava)
-    }
-
-    remapJar {
         destinationDirectory.set(file(rootProject.layout.buildDirectory).resolve("mods"))
     }
 

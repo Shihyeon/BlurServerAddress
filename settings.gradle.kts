@@ -9,6 +9,7 @@ pluginManagement {
     }
 }
 
+includeBuild("build-logic")
 include("common")
 include("fabric")
 include("neoforge")
